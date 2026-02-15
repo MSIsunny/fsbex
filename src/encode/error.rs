@@ -1,3 +1,4 @@
+use super::mpeg::MpegError;
 use super::pcm::PcmError;
 use super::vorbis::VorbisError;
 use crate::header::AudioFormat;
@@ -21,6 +22,9 @@ pub enum EncodeError {
     /// Failed to encode a Vorbis stream.
     /// See [`VorbisError`] for more information.
     Vorbis(VorbisError),
+    /// Failed to encode an MPEG stream.
+    /// See [`MpegError`] for more information.
+    Mpeg(MpegError),
 }
 
 impl From<PcmError> for EncodeError {
@@ -35,6 +39,12 @@ impl From<VorbisError> for EncodeError {
     }
 }
 
+impl From<MpegError> for EncodeError {
+    fn from(value: MpegError) -> Self {
+        Self::Mpeg(value)
+    }
+}
+
 impl Display for EncodeError {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match self {
@@ -43,6 +53,7 @@ impl Display for EncodeError {
             }
             Self::Pcm(_) => f.write_str("failed to encode PCM stream"),
             Self::Vorbis(_) => f.write_str("failed to encode Vorbis stream"),
+            Self::Mpeg(_) => f.write_str("failed to encode MPEG stream"),
         }
     }
 }
@@ -53,6 +64,7 @@ impl Error for EncodeError {
             Self::UnsupportedFormat { format: _ } => None,
             Self::Pcm(e) => Some(e),
             Self::Vorbis(e) => Some(e),
+            Self::Mpeg(e) => Some(e),
         }
     }
 }

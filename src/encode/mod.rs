@@ -5,6 +5,8 @@ use crate::read::Reader;
 use std::io::{Read, Write};
 
 mod error;
+mod mpeg;
+mod mpeg_fix;
 mod pcm;
 mod vorbis;
 mod vorbis_lookup;
@@ -46,6 +48,7 @@ pub(crate) fn encode<R: Read, W: Write>(
         AudioFormat::PcmFloat => {
             pcm::encode::<_, _, 4>(Format::Float, Endianness::Little, info, source, sink)?
         }
+        AudioFormat::Mpeg => mpeg::encode(info, source, sink)?,
         AudioFormat::Vorbis => vorbis::encode(info, source, sink)?,
         _ => return Err(EncodeError::UnsupportedFormat { format }),
     })
