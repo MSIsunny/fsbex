@@ -42,9 +42,12 @@ pub(super) fn encode<R: Read, W: Write>(
     let mut window = PreviousWindowRight::new();
 
     while source.position() - start_pos < stream_size {
-        let packet_size = source
-            .le_u16()
-            .map_err(VorbisError::from_read(VorbisErrorKind::ReadPacket))?;
+        // let packet_size = source
+        //     .le_u16()
+        //     .map_err(VorbisError::from_read(VorbisErrorKind::ReadPacket))?;
+        let Ok(packet_size) = source.le_u16() else {
+            break;
+        };
 
         // signals end of stream data
         if packet_size == u16::MIN || packet_size == u16::MAX {
